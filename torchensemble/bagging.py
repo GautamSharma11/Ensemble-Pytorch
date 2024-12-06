@@ -91,8 +91,6 @@ class BaggingClassifier(BaseClassifier):
         """Implementation on the data forwarding in BaggingClassifier.""",
         "classifier_forward",
     )
-    self.estimators_ = []
-    self.optimizers_ = []
     def forward(self, *x):
         # Average over class distributions from all base estimators.
         outputs = [
@@ -141,13 +139,13 @@ class BaggingClassifier(BaseClassifier):
         self.n_outputs = self._decide_n_outputs(train_loader)
 
         # Instantiate a pool of base estimators, optimizers, and schedulers.
-        estimators = getattr(self, "estimators_", [])
-        if not estimators:
-          estimators = [self._make_estimator() for _ in range(self.n_estimators)]
-
-        optimizers = getattr(self, "optimizers_", [])
-        if not optimizers:
-          optimizers = [set_module.set_optimizer(est, self.optimizer_name, **self.optimizer_args) for est in estimators]
+        if not hasattr(self, "estimators_"):
+          self.estimators_ = [self._make_estimator() for _ in range(self.n_estimators)]
+        estimators = self.estimators_
+      
+        if not hasattr(self, "optimizers_"):
+          self.optimizers_ = [set_module.set_optimizer(est, self.optimizer_name, **self.optimizer_args) for est in estimators]
+        optimizers = self.optimizers_
           
         if self.use_scheduler_:
             scheduler_ = set_module.set_scheduler(
