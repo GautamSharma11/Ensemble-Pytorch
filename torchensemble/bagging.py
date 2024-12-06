@@ -140,7 +140,7 @@ class BaggingClassifier(BaseClassifier):
 
         # Instantiate a pool of base estimators, optimizers, and schedulers.
         if not hasattr(self, "estimators_"):
-          self.estimators_ = [self._make_estimator() for _ in range(self.n_estimators)]
+          self.estimators_ = nn.ModuleList([self._make_estimator() for _ in range(self.n_estimators)])
         estimators = self.estimators_
       
         if not hasattr(self, "optimizers_"):
