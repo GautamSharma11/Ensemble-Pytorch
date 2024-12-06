@@ -149,7 +149,7 @@ class BaggingClassifier(BaseClassifier):
           
         if self.use_scheduler_:
             scheduler_ = set_module.set_scheduler(
-                optimizers[0], self.scheduler_name, **self.scheduler_args
+                self.optimizers_[0], self.scheduler_name, **self.scheduler_args
             )
 
         # Check the training criterion
