@@ -139,17 +139,16 @@ class BaggingClassifier(BaseClassifier):
         self.n_outputs = self._decide_n_outputs(train_loader)
 
         # Instantiate a pool of base estimators, optimizers, and schedulers.
-        estimators = []
-        for _ in range(self.n_estimators):
-            estimators.append(self._make_estimator())
+        estimators = getattr(self, "estimators_", [])
+        if not estimators:
+          estimators = nn.ModuleList([self._make_estimator() for _ in range(self.n_estimators)])
+          self.estimators_ = estimators
 
-        optimizers = []
-        for i in range(self.n_estimators):
-            optimizers.append(
-                set_module.set_optimizer(
-                    estimators[i], self.optimizer_name, **self.optimizer_args
-                )
-            )
+
+        optimizers = getattr(self, "optimizers_", [])
+        if not optimizers:
+          optimizers = [set_module.set_optimizer(est, self.optimizer_name, **self.optimizer_args) for est in estimators]
+          self.optimizers_ = optimizers
 
         if self.use_scheduler_:
             scheduler_ = set_module.set_scheduler(
@@ -220,6 +219,8 @@ class BaggingClassifier(BaseClassifier):
                     estimators.append(estimator)
                     optimizers.append(optimizer)
                     losses.append(loss)
+                self.estimators_ = nn.ModuleList(estimators)
+                self.optimizers_ = optimizers
 
                 # Validation
                 if test_loader:
