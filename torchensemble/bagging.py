@@ -254,6 +254,7 @@ class BaggingClassifier(BaseClassifier):
                             " % | Historical Best: {:.3f} %"
                         )
                         self.logger.info(msg.format(epoch, acc, best_acc))
+                        print(msg.format(epoch, acc, best_acc))
                         if self.tb_logger:
                             self.tb_logger.add_scalar(
                                 "bagging/Validation_Acc", acc, epoch
