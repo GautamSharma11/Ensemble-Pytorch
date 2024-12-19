@@ -67,7 +67,7 @@ def load(model, save_dir="./", map_location=None, logger=None):
     if logger:
         logger.info("Loading the model from `{}`".format(save_dir))
 
-    state = torch.load(save_dir, map_location=map_location)
+    state = torch.load(save_dir, map_location=map_location,weights_only=False)
     n_estimators = state["n_estimators"]
     model_params = state["model"]
     model._criterion = state["_criterion"]
